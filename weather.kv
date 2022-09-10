@@ -1,0 +1,82 @@
+WeatherRoot:
+
+<WeatherRoot>:
+    AddLocationForm
+
+<AddLocationForm>:
+    orientation: 'vertical'
+    search_input: search_box
+    search_results: search_results_list
+    BoxLayout:
+        size_hint_y: None
+        height: '40dp'
+        TextInput:
+            id: search_box
+            size_hint_x: 50
+            focus: True
+            multiline: False
+            on_text_validate: root.search_pokemon()
+        Button:
+            text: 'Search'
+            size_hint_x: 25
+            on_press: root.search_pokemon()
+        Button:
+            text: 'Current Location'
+            size_hint_x: 25
+    RV:
+        id: search_results_list
+
+    Button:
+        size_hint_y: None
+        height: "40dp"
+        text: 'Cancel'
+        on_press: app.root.show_pokemon(None)
+
+<SelectableLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: (.0, 0.9, .1, .3) if self.selected else (0, 0, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+<RV>:
+    viewclass: 'SelectableLabel'
+    SelectableRecycleBoxLayout:
+        default_size: None, dp(56)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        orientation: 'vertical'
+        multiselect: False
+        touch_multiselect: True
+
+<CurrentPokemon>:
+    orientation: 'vertical'
+    order: None
+    pokename: ""
+    type: ""
+    sprite: ""
+    BoxLayout:
+        Label:
+            text: str(root.order)
+        Label:
+            text: str(root.pokename)
+            font_size: "30dp"
+    Label:
+        text: 'Type: ' + str(root.type)
+    Label:
+        text: 'Image: ' + str(root.sprite)
+
+    BoxLayout:
+        size_hint_y: None
+        height: '80dp'
+        Button:
+            text: "Add Pokemon"
+            on_press: app.root.search_pokemon_form()
+        Button:
+            text: 'Forecast'
+
+
+
+
