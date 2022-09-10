@@ -53,6 +53,7 @@ WeatherRoot:
 
 <CurrentPokemon>:
     orientation: 'vertical'
+    conditions: conditions
     order: None
     pokename: ""
     type: ""
@@ -63,6 +64,10 @@ WeatherRoot:
         Label:
             text: str(root.pokename)
             font_size: "30dp"
+    BoxLayout:
+        orientation: 'vertical'
+        id: conditions
+
     Label:
         text: 'Type: ' + str(root.type)
     Label:
@@ -77,6 +82,17 @@ WeatherRoot:
         Button:
             text: 'Forecast'
 
+<UnknownConditions@Conditions>:
+    canvas.before:
+        Color:
+            rgb:[.2, .2, .2]
+        Ellipse:
+            pos: self.pos
+            size: self.width/2, self.height /2
 
+<Conditions>:
+
+    Label:
+        text: root.conditions
 
 

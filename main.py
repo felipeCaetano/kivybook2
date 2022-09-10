@@ -1,7 +1,10 @@
 import json
+import random
 
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.factory import Factory
+from kivy.graphics import Color, Ellipse
 from kivy.network.urlrequest import UrlRequest
 from kivy.properties import ObjectProperty, BooleanProperty, ListProperty, \
     StringProperty
@@ -102,6 +105,7 @@ class CurrentPokemon(BoxLayout):
     pokename = StringProperty([])
     type = StringProperty()
     sprite = StringProperty()
+    conditions = ObjectProperty()
 
     def update_pokemon(self):
         url = f"https://pokeapi.co/api/v2/pokemon/{self.pokename}"
@@ -116,6 +120,55 @@ class CurrentPokemon(BoxLayout):
         self.sprite = data['sprites']['front_default']
         self.type = data['types'][0]['type']['name']
         self.order = data['id']
+        self.conditions.clear_widgets()
+        for stat_index, stats in enumerate(data['stats']):
+            print(stat_index, stats)
+            self.render_conditions(data['stats'][stat_index]) #
+
+    def render_conditions(self, conditions_description):
+
+        if 'hp' in conditions_description['stat']['name']:
+            print(conditions_description['stat'])
+            conditions_widget = HpConditions()
+            conditions_widget.conditions = conditions_description['stat']['name']
+        else:
+            conditions_widget = Factory.UnknownConditions()
+        self.conditions.add_widget(conditions_widget)
+
+
+class Conditions(BoxLayout):
+    conditions = StringProperty()
+
+
+class HpConditions(Conditions):
+    FLAKE_SIZE = 3
+    NUM_FLAKES = 150
+    FLAKE_AREA = FLAKE_SIZE * NUM_FLAKES
+    FLAKE_INTERVAL = 1 / 30
+
+    def __init__(self, **kwargs):
+        super(HpConditions, self).__init__(**kwargs)
+        self.flakes = [[x * self.FLAKE_SIZE, 0] for x in range(self.NUM_FLAKES)]
+        Clock.schedule_interval(self.update_flakes, self.FLAKE_INTERVAL)
+
+    def update_flakes(self, time):
+        for f in self.flakes:
+            f[1] += random.choice([-.1, .1])
+            f[0] += random.randint(0, self.FLAKE_SIZE)
+            if f[0] <= 0:
+                f[0] = random.randint(0, int(self.width))
+            elif f[0] >= self.width:
+                f[0] = random.randint(0, int(self.width))
+        self.canvas.before.clear()
+        with self.canvas.before:
+            widget_x = self.center_x - self.FLAKE_AREA
+            widget_y = self.center_y
+            for x_flake, y_flake in self.flakes:
+                x = widget_x + x_flake
+                y = widget_y - y_flake
+                Color(.9, .1, .1)
+                Ellipse(pos=(x, y), size=(self.FLAKE_SIZE, self.FLAKE_SIZE))
+
 
 
 class WeatherApp(App):
